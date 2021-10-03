@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    <rpc_caller rpc_name="login" timeout="3000"/>       rpc发起方，只生成发送相关函数以及回调相关函数
+    <rpc_executor rpc_name="login"/>                    rpc执行方，只生成处理用的函数
+    <rpc_all rpc_name="login" timeout="3000"/>          既可以是rpc发起方也可以是执行方
+
+    <notify_sender message="chat_message"/>             notify发件人，只生成发送相关的函数
+    <notify_receiver message="chat_message"/>           notify接收人，只生成处理用的函数
+    <notify_all message="chat_message"/>                既可以是notify发件人也可以是接收人
+-->
+<project name="chat_room">
+    <enum name="response_error_code">
+        <var name="success" id="0"/>
+        <var name="rpc_timeout" id="1"/>
+        <var name="unknown_error" id="2"/>
+    </enum>
+    <message name="common_response" id="16">
+        <var name="error_code" type="response_error_code"/>
+    </message>
+    <message name="login_request" id="17">
+        <var name="account" type="string"/>
+        <var name="password" type="string"/>
+    </message>
+    <message name="login_response" id="18">
+        <var name="error_code" type="response_error_code"/>
+        <var name="user_name" type="string"/>
+    </message>
+    <rpc name="login" request="login_request" response="login_response"/>
+    <message name="chat_message" id="19">
+        <var name="from" type="string"/>account
+        <var name="to" type="string"/>account
+        <var name="message" type="string"/>
+    </message>
+    <application name="chat_server">
+        <tcp_server name="client_listener" remote="chat_client">
+            <rpc_executor rpc_name="login"/>
+            <notify_all name="chat_message"/>
+        </tcp_server>
+    </application>
+
+    <application name="chat_client">
+        <tcp_client name="server_connector" remote="chat_server">
+            <rpc_caller rpc_name="login" timeout="3000"/>
+            <notify_all name="chat_message"/>
+        </tcp_client>
+    </application>
+</project>

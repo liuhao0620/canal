@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package chat_room;
+
+enum message_id
+{
+  mid_invalid = 0;
+  mid_canal_rpc_request = 1;
+  mid_canal_rpc_response = 2;
+  mid_common_response = 16;
+  mid_login_request = 17;
+  mid_login_response = 18;
+  mid_chat_message = 19;
+}
+
+message canal_rpc_request
+{
+  uint64 serial_number = 1;
+  message_id request_message_id = 2;
+  bytes request_body = 3;
+}
+
+message canal_rpc_response
+{
+  uint64 serial_number = 1;
+  bytes response_body = 2;
+}
+
+enum response_error_code
+{
+  success = 0;
+  rpc_timeout = 1;
+  unknown_error = 2;
+}
+
+message common_response   // 16
+{
+  response_error_code error_code = 1;
+}
+
+message login_request     // 17
+{
+  string account = 1;
+  string password = 2;
+}
+
+message login_response    // 18
+{
+  response_error_code error_code = 1;
+  string user_name = 2;
+}
+
+message chat_message      // 19
+{
+  string from = 1;
+  string to = 2;
+  string message = 3;
+}
